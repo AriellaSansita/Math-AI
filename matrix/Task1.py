@@ -1,3 +1,10 @@
+import streamlit as st
+
+uploaded_file = st.file_uploader("Upload a file")
+if uploaded_file is not None:
+    # process the file
+    content = uploaded_file.read()
+
 from google.colab import files
 uploaded = files.upload()
 import numpy as np
