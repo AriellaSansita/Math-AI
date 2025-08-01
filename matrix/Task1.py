@@ -1,40 +1,38 @@
 import streamlit as st
-
-uploaded_file = st.file_uploader("Upload a file")
-if uploaded_file is not None:
-    # process the file
-    content = uploaded_file.read()
-
-from google.colab import files
-uploaded = files.upload()
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 from PIL import Image
+import io
 
-image_path = "one.png"
-print(f"Loading image from: {image_path}")
+st.title("Gaussian Smoothing of Uploaded Image")
 
-try:
-    image = Image.open(image_path).convert('L') 
-except FileNotFoundError:
-    print(f"Error: The file at {image_path} was not found.")
-    exit()
+# Upload image
+uploaded_file = st.file_uploader("Upload a grayscale image (e.g., PNG)", type=["png", "jpg", "jpeg"])
 
-image_array = np.array(image)
+if uploaded_file is not None:
+    # Open image
+    try:
+        image = Image.open(uploaded_file).convert('L')  # Convert to grayscale
+    except Exception as e:
+        st.error(f"Error loading image: {e}")
+        st.stop()
 
-smoothed_image = gaussian_filter(image_array, sigma=2)
+    image_array = np.array(image)
 
-plt.figure(figsize=(10, 5))
+    # Apply Gaussian filter
+    smoothed_image = gaussian_filter(image_array, sigma=2)
 
-plt.subplot(1, 2, 1)
-plt.title("Original Image")
-plt.imshow(image_array, cmap='gray')
-plt.axis('off')
+    # Display images side by side
+    st.subheader("Original vs Smoothed Image")
+    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
-plt.subplot(1, 2, 2)
-plt.title("Smoothed Image")
-plt.imshow(smoothed_image, cmap='gray')
-plt.axis('off')
+    ax[0].imshow(image_array, cmap='gray')
+    ax[0].set_title("Original Image")
+    ax[0].axis('off')
 
-plt.show()
+    ax[1].imshow(smoothed_image, cmap='gray')
+    ax[1].set_title("Smoothed Image")
+    ax[1].axis('off')
+
+    st.pyplot(fig)
